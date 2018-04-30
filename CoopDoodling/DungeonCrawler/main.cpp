@@ -15,12 +15,11 @@ struct Zone {
 
 Zone generateZone();
 
-sf::Texture playerFrameTexture;
 sf::Sprite playerFrame;
 sf::Sprite playerSprite;
 sf::Sprite groundSprite;
 int clientId;
-int currentTurn;
+Player* activePlayer;
 void passTurn() {};
 sf::Clock systemTime;
 
@@ -34,6 +33,11 @@ std::uniform_int_distribution<> dis(0, 255);
 
 int main(int argc, char* argv[])
 {
+	sf::Texture playerFrameTexture;
+	playerFrameTexture.loadFromFile("playerFrame.png");
+	playerFrame.setTexture(playerFrameTexture);
+	playerFrame.setOrigin(32.0f, 32.0f);
+
 	systemTime.restart();
 	sf::Clock clock;
 	clock.restart();
@@ -71,7 +75,9 @@ int main(int argc, char* argv[])
 		player->m_sprite.setColor(playerColor);
 		player->m_sprite.setOrigin(32, 32);
 		player->m_sprite.setPosition(sf::Vector2f(200, 200));
+		player->m_sprite.setScale(0.8f, 0.8f);
 		players.push_back(player);
+		activePlayer = player;
 	}
 
 	//set window settings
@@ -99,7 +105,7 @@ int main(int argc, char* argv[])
 					window.close();
 
 				//handle turns
-				if (currentTurn == clientId
+				if (activePlayer->m_id == clientId
 					&& event.type == sf::Event::KeyPressed) {
 					if (event.key.code == sf::Keyboard::W) {
 						for (Player* player : players) {
@@ -154,6 +160,10 @@ int main(int argc, char* argv[])
 
 			window.clear();
 			for (Player* player : players) {
+				if (player->m_id == clientId) {
+					playerFrame.setPosition(player->m_sprite.getPosition());
+					window.draw(playerFrame);
+				}
 				window.draw(player->m_sprite);
 			}
 			window.display();
