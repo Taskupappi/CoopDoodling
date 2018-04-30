@@ -129,7 +129,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="inGame.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="network.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inGame.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="scene.h" />
+    <ClInclude Include="tile.h" />
+    <ClInclude Include="tilemap.h" />
+    <ClInclude Include="zone.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
