@@ -4,15 +4,16 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\Network.hpp>
 
+#include "zone.h"
+
 class Player {
 public:
-	Player()
-		:m_actions(3),
-		m_initReady(false),
-		m_actionsLeft(3)
-	{};
-	~Player() {};
-	void endTurn() { m_actionsLeft = m_actions; };
+	Player(Zone* zone);
+	~Player();
+	void endTurn();
+	void move(int x, int y);
+
+
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
 	sf::TcpSocket m_socket;
@@ -21,6 +22,7 @@ public:
 	int m_id;
 	int m_actionsLeft;
 	int m_actions;
+	Zone* m_zone
 };
 
 #endif

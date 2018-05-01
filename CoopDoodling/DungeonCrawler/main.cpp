@@ -7,14 +7,6 @@
 #include <chrono>
 #include "Player.h"
 
-struct Zone {
-	enum class tileType {
-		ground,
-	};
-};
-
-Zone generateZone();
-
 sf::Sprite playerFrame;
 sf::Sprite playerSprite;
 sf::Sprite groundSprite;
@@ -30,6 +22,8 @@ std::vector<int> turnOrder;
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(0, 255);
+
+void sendTurn();
 
 int main(int argc, char* argv[])
 {
@@ -73,7 +67,7 @@ int main(int argc, char* argv[])
 		player->m_texture.loadFromFile("testSprite.png");
 		player->m_sprite.setTexture(player->m_texture);
 		player->m_sprite.setColor(playerColor);
-		player->m_sprite.setOrigin(32, 32);
+		player->m_sprite.setOrigin((TILESIZE / 2.0f), (TILESIZE / 2.0f));
 		player->m_sprite.setPosition(sf::Vector2f(200, 200));
 		player->m_sprite.setScale(0.8f, 0.8f);
 		players.push_back(player);
@@ -92,11 +86,7 @@ int main(int argc, char* argv[])
 		//print mouse position
 
 		if (network.isHost()) {
-			//handle new players connecting to a game
-			network.CheckNewConnections();
-
 			///receive data
-
 			///actions
 			sf::Event event;
 			while (window.pollEvent(event))
@@ -104,60 +94,45 @@ int main(int argc, char* argv[])
 				if (event.type == sf::Event::Closed)
 					window.close();
 
-				//handle turns
+				//handle keyboard events
 				if (activePlayer->m_id == clientId
 					&& event.type == sf::Event::KeyPressed) {
-					if (event.key.code == sf::Keyboard::W) {
-						for (Player* player : players) {
-							if (player->m_id == clientId
-								&& player->m_actionsLeft > 0) {
-								player->m_sprite.move(0, -(player->m_sprite.getGlobalBounds().height));
-								--player->m_actionsLeft;
-								if (player->m_actionsLeft == 0) {
-									player->endTurn();
-								}
-							}
+					if (event.key.code == sf::Keyboard::W
+						&& activePlayer->m_actionsLeft > 0) {
+						activePlayer->m_sprite.move(0, -(activePlayer->m_sprite.getGlobalBounds().height));
+						--activePlayer->m_actionsLeft;
+						if (activePlayer->m_actionsLeft == 0) {
+							activePlayer->endTurn();
+						}
+					} 
+					else if (event.key.code == sf::Keyboard::S
+						&& activePlayer->m_actionsLeft > 0) {
+						activePlayer->m_sprite.move(0, activePlayer->m_sprite.getGlobalBounds().height);
+						--activePlayer->m_actionsLeft;
+						if (activePlayer->m_actionsLeft == 0) {
+							activePlayer->endTurn();
 						}
 					}
-					else if (event.key.code == sf::Keyboard::S) {
-						for (Player* player : players) {
-							if (player->m_id == clientId
-								&& player->m_actionsLeft > 0) {
-								player->m_sprite.move(0, player->m_sprite.getGlobalBounds().height);
-								--player->m_actionsLeft;
-								if (player->m_actionsLeft == 0) {
-									player->endTurn();
-								}
-							}
+					else if (event.key.code == sf::Keyboard::A
+						&& activePlayer->m_actions > 0) {
+						activePlayer->m_sprite.move(-(activePlayer->m_sprite.getGlobalBounds().width), 0);
+						--activePlayer->m_actionsLeft;
+						if (activePlayer->m_actionsLeft == 0) {
+							activePlayer->endTurn();
 						}
 					}
-					else if (event.key.code == sf::Keyboard::A) {
-						for (Player* player : players) {
-							if (player->m_id == clientId
-								&& player->m_actionsLeft > 0) {
-								player->m_sprite.move(-(player->m_sprite.getGlobalBounds().width), 0);
-								--player->m_actionsLeft;
-								if (player->m_actionsLeft == 0) {
-									player->endTurn();
-								}
-							}
-						}
-					}
-					else if (event.key.code == sf::Keyboard::D) {
-						for (Player* player : players) {
-							if (player->m_id == clientId
-								&& player->m_actionsLeft > 0) {
-								player->m_sprite.move(player->m_sprite.getGlobalBounds().width, 0);
-								--player->m_actionsLeft;
-								if (player->m_actionsLeft == 0) {
-									player->endTurn();
-								}
-							}
+					else if (event.key.code == sf::Keyboard::D
+						&& activePlayer->m_actions > 0) {
+						activePlayer->m_sprite.move(activePlayer->m_sprite.getGlobalBounds().width, 0);
+						--activePlayer->m_actionsLeft;
+						if (activePlayer->m_actionsLeft == 0) {
+							activePlayer->endTurn();
 						}
 					}
 				}
 			}			
 
+			//draw stuff
 			window.clear();
 			for (Player* player : players) {
 				if (player->m_id == clientId) {
@@ -167,6 +142,16 @@ int main(int argc, char* argv[])
 				window.draw(player->m_sprite);
 			}
 			window.display();
+
+			if (activePlayer->m_actions == 0
+				&& activePlayer->m_id == clientId) {
+				//send data of movement to clients
+				sendTurn();
+			}
+
+
+			//handle new players connecting to a game
+			network.CheckNewConnections();
 		}
 		else {
 
@@ -184,10 +169,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-
-Zone generateZone()
+void sendTurn()
 {
-	Zone zone;
-	
-	return zone;
-};
+
+}
