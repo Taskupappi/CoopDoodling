@@ -27,6 +27,8 @@ void sendTurn();
 
 int main(int argc, char* argv[])
 {
+	Zone zone(3,3);
+
 	sf::Texture playerFrameTexture;
 	playerFrameTexture.loadFromFile("playerFrame.png");
 	playerFrame.setTexture(playerFrameTexture);
@@ -62,7 +64,7 @@ int main(int argc, char* argv[])
 		}
 		sf::Color playerColor(dis(gen), dis(gen), dis(gen), 255);
 		//sf::Color playerColor = sf::Color::White;
-		Player* player = new Player();
+		Player* player = new Player(&zone);
 		player->m_id = clientId;
 		player->m_texture.loadFromFile("testSprite.png");
 		player->m_sprite.setTexture(player->m_texture);
@@ -134,6 +136,9 @@ int main(int argc, char* argv[])
 
 			//draw stuff
 			window.clear();
+			
+			zone.draw(&window);
+			
 			for (Player* player : players) {
 				if (player->m_id == clientId) {
 					playerFrame.setPosition(player->m_sprite.getPosition());
@@ -141,6 +146,7 @@ int main(int argc, char* argv[])
 				}
 				window.draw(player->m_sprite);
 			}
+
 			window.display();
 
 			if (activePlayer->m_actions == 0

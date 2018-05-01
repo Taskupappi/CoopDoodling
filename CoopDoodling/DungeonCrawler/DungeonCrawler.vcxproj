@@ -132,6 +132,9 @@
     <ClCompile Include="inGame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="network.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="tile.cpp" />
+    <ClCompile Include="zone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inGame.h" />
@@ -139,7 +142,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="tile.h" />
-    <ClInclude Include="tilemap.h" />
     <ClInclude Include="zone.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

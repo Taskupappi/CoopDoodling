@@ -22,7 +22,7 @@ public:
 	int m_id;
 	int m_actionsLeft;
 	int m_actions;
-	Zone* m_zone
+	Zone* m_zone;
 };
 
 #endif

@@ -10,6 +10,7 @@ class Zone
 public:
 	Zone(std::uint64_t xSize, std::uint64_t ySize);
 	~Zone();
+	void draw(sf::RenderWindow* window);
 
 private:
 	std::vector<Tile*> m_tiles;

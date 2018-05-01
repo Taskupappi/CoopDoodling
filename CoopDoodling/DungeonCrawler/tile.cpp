@@ -22,3 +22,8 @@ void Tile::setPlayer(Player* player)
 {
 	m_player = player;
 }
+
+sf::Vector2f Tile::position()
+{
+	return m_position;
+}

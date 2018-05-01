@@ -24,6 +24,15 @@
     <ClCompile Include="inGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="zone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="network.h">
@@ -36,9 +45,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inGame.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tilemap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="zone.h">
