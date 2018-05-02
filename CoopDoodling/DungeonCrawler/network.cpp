@@ -1,6 +1,7 @@
 #include "network.h"
 
 Network::Network()
+	:m_newConnection(false)
 {
 }
 
@@ -20,4 +21,9 @@ bool Network::connect(sf::IpAddress address)
 
 void Network::CheckNewConnections()
 {
+	if (m_newConnection) {
+		for (sf::TcpSocket* socket : m_clients) {
+
+		}
+	}
 }

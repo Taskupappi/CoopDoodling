@@ -6,8 +6,10 @@ Zone::Zone(std::uint64_t xSize, std::uint64_t ySize)
 {
 	m_groundTexture.loadFromFile("groundSprite.png");
 	m_groundSprite = new sf::Sprite(m_groundTexture);
+	m_groundSprite->setOrigin((xSize / 2.0f), (ySize / 2.0));
 	m_wallTexture.loadFromFile("wallSprite.png");
 	m_wallSprite = new sf::Sprite(m_wallTexture);
+	m_wallSprite->setOrigin((xSize / 2.0f), (ySize / 2.0));
 	
 	for (std::uint64_t x = 0; x < xSize; ++x) {
 		for (std::uint64_t y = 0; y < ySize; ++y) {

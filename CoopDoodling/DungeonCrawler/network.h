@@ -20,6 +20,7 @@ private:
 	sf::TcpListener m_listener;
 	std::vector<sf::TcpSocket*> m_clients;
 	bool m_isHost;
+	bool m_newConnection;
 };
 
 #endif
