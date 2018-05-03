@@ -15,7 +15,7 @@ Player::~Player()
 
 void Player::endTurn()
 {
-	m_actionsLeft = m_actions;
+	m_actionsLeft = m_actions;	
 }
 
 void Player::move(int x, int y)

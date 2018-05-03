@@ -23,6 +23,7 @@ public:
 	int m_actionsLeft;
 	int m_actions;
 	Zone* m_zone;
+	sf::Vector2i m_position;
 private:
 	sf::Color m_color;
 	sf::TcpSocket* m_socket;

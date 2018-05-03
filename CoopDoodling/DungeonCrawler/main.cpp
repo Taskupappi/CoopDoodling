@@ -19,11 +19,18 @@ std::vector<Player*> players;
 std::vector<int> turnOrder;
 sf::Color randomPlayerColor();
 
+struct Move {
+	sf::Vector2i oldPosition;
+	sf::Vector2i newPosition;
+};
+std::vector<Move> activePlayerMoves;
+
 //random
 std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_int_distribution<> dis(0, 255);
 
+void endTurn();
 void sendTurn();
 
 int main(int argc, char* argv[])
@@ -102,34 +109,50 @@ int main(int argc, char* argv[])
 					&& event.type == sf::Event::KeyPressed) {
 					if (event.key.code == sf::Keyboard::W
 						&& activePlayer->m_actionsLeft > 0) {
+						Move move;
+						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(0, -(activePlayer->m_sprite.getGlobalBounds().height));
-						--activePlayer->m_actionsLeft;
+						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
+						activePlayerMoves.push_back(move);
+						--activePlayer->m_actionsLeft;						
 						if (activePlayer->m_actionsLeft == 0) {
-							activePlayer->endTurn();
+							endTurn();
 						}
 					} 
 					else if (event.key.code == sf::Keyboard::S
 						&& activePlayer->m_actionsLeft > 0) {
+						Move move;
+						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(0, activePlayer->m_sprite.getGlobalBounds().height);
+						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
+						activePlayerMoves.push_back(move);
 						--activePlayer->m_actionsLeft;
 						if (activePlayer->m_actionsLeft == 0) {
-							activePlayer->endTurn();
+							endTurn();
 						}
 					}
 					else if (event.key.code == sf::Keyboard::A
 						&& activePlayer->m_actions > 0) {
+						Move move;
+						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(-(activePlayer->m_sprite.getGlobalBounds().width), 0);
+						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
+						activePlayerMoves.push_back(move);
 						--activePlayer->m_actionsLeft;
 						if (activePlayer->m_actionsLeft == 0) {
-							activePlayer->endTurn();
+							endTurn();
 						}
 					}
 					else if (event.key.code == sf::Keyboard::D
 						&& activePlayer->m_actions > 0) {
+						Move move;
+						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(activePlayer->m_sprite.getGlobalBounds().width, 0);
+						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
+						activePlayerMoves.push_back(move);
 						--activePlayer->m_actionsLeft;
 						if (activePlayer->m_actionsLeft == 0) {
-							activePlayer->endTurn();
+							endTurn();
 						}
 					}
 				}
@@ -153,7 +176,15 @@ int main(int argc, char* argv[])
 			if (activePlayer->m_actions == 0
 				&& activePlayer->m_id == clientId) {
 				//send data of movement to clients
-				sendTurn();
+				
+				//pack moves
+
+				
+				//send packed moves
+				for (Player* player : players) {
+
+				}
+
 			}
 			
 			//handle new players connecting to a game
@@ -244,30 +275,7 @@ int main(int argc, char* argv[])
 				&& activePlayer->m_id == clientId) {
 				//send data of movement to clients
 				sendTurn();
-			}
-
-
-			//handle new players connecting to a game
-			sf::TcpSocket* socket = new sf::TcpSocket();
-			if (network.listener().accept(*socket) == sf::Socket::Done) {
-				Player* player = new Player(&zone);
-				player->m_id = clientId;
-				player->m_texture.loadFromFile("testSprite.png");
-				player->m_sprite.setTexture(player->m_texture);
-				player->m_sprite.setColor(randomPlayerColor());
-				player->m_sprite.setOrigin((TILESIZE / 2.0f), (TILESIZE / 2.0f));
-				std::uniform_int_distribution<> pos(0, 8);
-				float x = static_cast<float>(pos(gen));
-				float y = static_cast<float>(pos(gen));
-				player->m_sprite.setPosition(sf::Vector2f(TILESIZE * x, TILESIZE * y));
-				player->m_sprite.setScale(0.8f, 0.8f);
-				player->setSocket(socket);
-				players.push_back(player);
-			}
-			else {
-				delete socket;
-				socket = nullptr;
-			}
+			}			
 		}
 
 
@@ -300,6 +308,12 @@ sf::Color randomPlayerColor()
 		}
 	}
 	return playerColor;
+}
+
+void endTurn()
+{
+	activePlayer->endTurn();
+
 }
 
 void sendTurn()
