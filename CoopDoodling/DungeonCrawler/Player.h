@@ -12,17 +12,20 @@ public:
 	~Player();
 	void endTurn();
 	void move(int x, int y);
-
+	void setSocket(sf::TcpSocket* socket);
+	sf::TcpSocket* socket();
+	sf::Color color() { return m_color; }
 
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
-	sf::TcpSocket m_socket;
 	bool m_initReady = false;
-	sf::Color m_color;
 	int m_id;
 	int m_actionsLeft;
 	int m_actions;
 	Zone* m_zone;
+private:
+	sf::Color m_color;
+	sf::TcpSocket* m_socket;
 };
 
 #endif

@@ -3,6 +3,8 @@
 Network::Network()
 	:m_newConnection(false)
 {
+	m_listener.setBlocking(false);
+	m_socket.setBlocking(true);
 }
 
 Network::~Network()
@@ -11,7 +13,7 @@ Network::~Network()
 
 bool Network::connect(sf::IpAddress address)
 {
-	sf::Socket::Status status = m_socket.connect(address, 32431);
+	sf::Socket::Status status = m_socket.connect(address, PORT);
 	if (status != sf::Socket::Done) {
 		std::cout << "couldn't connect to network!" << std::endl;
 		return false;
@@ -19,11 +21,3 @@ bool Network::connect(sf::IpAddress address)
 	return true;
 }
 
-void Network::CheckNewConnections()
-{
-	if (m_newConnection) {
-		for (sf::TcpSocket* socket : m_clients) {
-
-		}
-	}
-}
