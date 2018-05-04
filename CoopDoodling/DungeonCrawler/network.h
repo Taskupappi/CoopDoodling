@@ -14,12 +14,14 @@ public:
 	sf::TcpListener& listener() { return m_listener; }
 	bool isHost() { return m_isHost; }
 	void setHost(bool isHost) { m_isHost = isHost; };
-
+	void storePacket(sf::Packet& packet);
+	std::vector<sf::Packet>& packets();
 private:
 	sf::TcpSocket m_socket;
 	sf::TcpListener m_listener;
 	bool m_isHost;
 	bool m_newConnection;
+	std::vector<sf::Packet> m_packets
 };
 
 #endif

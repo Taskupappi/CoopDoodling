@@ -7,6 +7,12 @@
 #include <chrono>
 #include "Player.h"
 
+#define SCREEN_DIMENSION_X 800
+#define SCREEN_DIMENSION_Y 600
+
+sf::Font font;
+sf::Text playerTurn;
+
 sf::Sprite playerFrame;
 sf::Sprite playerSprite;
 sf::Sprite groundSprite;
@@ -22,6 +28,7 @@ sf::Color randomPlayerColor();
 struct Move {
 	sf::Vector2i oldPosition;
 	sf::Vector2i newPosition;
+	int playerId;
 };
 std::vector<Move> activePlayerMoves;
 
@@ -35,6 +42,16 @@ void sendTurn();
 
 int main(int argc, char* argv[])
 {
+	if (!font.loadFromFile("veteran_typewriter.ttf")) {
+		std::cerr << "failed to load the required fontti.txt" << std::endl;
+		system("PAUSE");
+		return -1;
+	}
+	playerTurn.setFont(font);
+	playerTurn.setCharacterSize(20);
+	playerTurn.setStyle(sf::Text::Regular);
+	playerTurn.setPosition(SCREEN_DIMENSION_X / 2.0f, 30.0f);
+
 	Zone zone(3,3);
 
 	sf::Texture playerFrameTexture;
@@ -85,7 +102,7 @@ int main(int argc, char* argv[])
 	}
 
 	//set window settings
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Dungeon Crawler");
+	sf::RenderWindow window(sf::VideoMode(SCREEN_DIMENSION_X, SCREEN_DIMENSION_Y), "Dungeon Crawler");
 	window.setKeyRepeatEnabled(true);
 	//set camera
 
@@ -93,6 +110,9 @@ int main(int argc, char* argv[])
 
 	while (window.isOpen())
 	{
+		playerTurn.setString("Player's: " + std::to_string(activePlayer->m_id) + " turn");
+		playerTurn.setOrigin(playerTurn.getLocalBounds().width / 2.0f,
+			playerTurn.getLocalBounds().height / 2.0f);
 		//print mouse position
 
 		if (network.isHost()) {
@@ -110,6 +130,7 @@ int main(int argc, char* argv[])
 					if (event.key.code == sf::Keyboard::W
 						&& activePlayer->m_actionsLeft > 0) {
 						Move move;
+						move.playerId = activePlayer->m_id;
 						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(0, -(activePlayer->m_sprite.getGlobalBounds().height));
 						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
@@ -122,6 +143,7 @@ int main(int argc, char* argv[])
 					else if (event.key.code == sf::Keyboard::S
 						&& activePlayer->m_actionsLeft > 0) {
 						Move move;
+						move.playerId = activePlayer->m_id;
 						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(0, activePlayer->m_sprite.getGlobalBounds().height);
 						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
@@ -134,6 +156,7 @@ int main(int argc, char* argv[])
 					else if (event.key.code == sf::Keyboard::A
 						&& activePlayer->m_actions > 0) {
 						Move move;
+						move.playerId = activePlayer->m_id;
 						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(-(activePlayer->m_sprite.getGlobalBounds().width), 0);
 						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
@@ -146,6 +169,7 @@ int main(int argc, char* argv[])
 					else if (event.key.code == sf::Keyboard::D
 						&& activePlayer->m_actions > 0) {
 						Move move;
+						move.playerId = activePlayer->m_id;
 						move.oldPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
 						activePlayer->m_sprite.move(activePlayer->m_sprite.getGlobalBounds().width, 0);
 						move.newPosition = sf::Vector2i(activePlayer->m_position.x, activePlayer->m_position.y);
@@ -170,6 +194,7 @@ int main(int argc, char* argv[])
 				}
 				window.draw(player->m_sprite);
 			}
+			window.draw(playerTurn);
 
 			window.display();
 
@@ -178,12 +203,22 @@ int main(int argc, char* argv[])
 				//send data of movement to clients
 				
 				//pack moves
-
+				for (Move move : activePlayerMoves) {
+					sf::Packet packet;
+					packet << move.playerId;
+					packet << move.oldPosition.x << move.oldPosition.y;
+					packet << move.newPosition.x << move.newPosition.y;
+					network.storePacket(packet);
+				}
 				
 				//send packed moves
 				for (Player* player : players) {
-
+					for (sf::Packet packet : network.packets()) {
+						player->socket()->send(packet);
+					}
 				}
+				//discard sent packets
+				network.packets().clear();
 
 			}
 			
@@ -212,6 +247,7 @@ int main(int argc, char* argv[])
 			//end turn
 		}
 		else {
+			//Client's side
 			sf::Event event;
 			while (window.pollEvent(event))
 			{
@@ -268,7 +304,7 @@ int main(int argc, char* argv[])
 				}
 				window.draw(player->m_sprite);
 			}
-
+			window.draw(playerTurn);
 			window.display();
 
 			if (activePlayer->m_actions == 0
@@ -313,7 +349,15 @@ sf::Color randomPlayerColor()
 void endTurn()
 {
 	activePlayer->endTurn();
-
+	for (int i = 0; i < players.size(); ++i) {
+		if (players[i]->m_id == activePlayer->m_id
+			&& (i + 1) < players.size()) {
+			activePlayer = players[i + 1];			
+		}
+		else {
+			activePlayer = players[0];
+		}
+	}
 }
 
 void sendTurn()
