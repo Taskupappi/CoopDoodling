@@ -14,11 +14,11 @@ public:
 	void move(int x, int y);
 	void setSocket(sf::TcpSocket* socket);
 	sf::TcpSocket* socket();
-	sf::Color color() { return m_color; }
-
+	sf::Color color() const { return m_color; }
+	void setColor(const sf::Color color) { m_color = color; }
 	sf::Sprite m_sprite;
 	sf::Texture m_texture;
-	bool m_initReady = false;
+	bool m_initReady;
 	int m_id;
 	int m_actionsLeft;
 	int m_actions;

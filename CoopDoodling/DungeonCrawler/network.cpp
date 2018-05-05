@@ -26,7 +26,7 @@ void Network::storePacket(sf::Packet & packet)
 	m_packets.push_back(packet);
 }
 
-std::vector<sf::Packet> Network::packets()
+std::vector<sf::Packet>& Network::packets()
 {
 	return m_packets;
 }

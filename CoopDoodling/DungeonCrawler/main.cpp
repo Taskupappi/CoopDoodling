@@ -9,6 +9,7 @@
 
 #define SCREEN_DIMENSION_X 800
 #define SCREEN_DIMENSION_Y 600
+#define FONT_NAME "veteran_typewriter.ttf"
 
 sf::Font font;
 sf::Text playerTurn;
@@ -42,8 +43,8 @@ void sendTurn();
 
 int main(int argc, char* argv[])
 {
-	if (!font.loadFromFile("veteran_typewriter.ttf")) {
-		std::cerr << "failed to load the required fontti.txt" << std::endl;
+	if (!font.loadFromFile(FONT_NAME)) {
+		std::cerr << "failed to load the required font: " << FONT_NAME << std::endl;
 		system("PAUSE");
 		return -1;
 	}
@@ -81,6 +82,10 @@ int main(int argc, char* argv[])
 			sf::IpAddress address(connectionAddress);
 			connected = network.connect(address);
 		} while (!connected);
+
+		//wait for the data required
+		sf::Packet packet;
+		network.socket().receive()
 	}
 	else if (connectionMode == "h") {
 		network.setHost(true);
@@ -205,9 +210,7 @@ int main(int argc, char* argv[])
 				//pack moves
 				for (Move move : activePlayerMoves) {
 					sf::Packet packet;
-					packet << move.playerId;
-					packet << move.oldPosition.x << move.oldPosition.y;
-					packet << move.newPosition.x << move.newPosition.y;
+					packet << move;
 					network.storePacket(packet);
 				}
 				
@@ -238,6 +241,10 @@ int main(int argc, char* argv[])
 				player->m_sprite.setScale(0.8f, 0.8f);
 				player->setSocket(socket);
 				players.push_back(player);
+
+				for (Player* player : players) {
+
+				}
 			}
 			else {
 				delete socket;
