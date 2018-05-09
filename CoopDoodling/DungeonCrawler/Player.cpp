@@ -1,5 +1,4 @@
 #include "Player.h"
-
 Player::Player(Zone* zone)
 	:m_actions(3),
 	m_initReady(false),

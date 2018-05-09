@@ -1,11 +1,17 @@
 #ifndef NETWORK_H
 #define NETWORK_H
-
-#include <SFML\Network.hpp>
 #include <iostream>
-#define PORT 3231
+#include <SFML\Graphics.hpp>
+#include <SFML\Network.hpp>
 
+#define PORT 3231
 class Player;
+
+struct Move {
+	sf::Vector2i oldPosition;
+	sf::Vector2i newPosition;
+	int playerId;
+};
 
 class Network
 {
@@ -31,37 +37,9 @@ private:
 	std::vector<sf::Packet> m_packets;
 };
 
-sf::Packet& operator <<(sf::Packet& packet, const Move& move) {
-	packet << move.playerId;
-	packet << move.oldPosition.x << move.oldPosition.y;
-	packet << move.newPosition.x << move.newPosition.y;
-}
-
-sf::Packet& operator >>(sf::Packet& packet, const Move& move) {
-	packet >> move.playerId;
-	packet >> move.oldPosition.x >> move.oldPosition.y;
-	packet >> move.newPosition.x >> move.newPosition.y;
-}
-
-sf::Packet& operator <<(sf::Packet& packet, const Player* player) {
-	packet << player->m_id;
-	packet << player->m_actions;
-	packet << player->m_actionsLeft;
-	packet << player->m_position.x << player->m_position.y;
-	packet << player->color().r << player->color().g << player->color().b << player->color().a;
-}
-
-sf::Packet& operator >>(sf::Packet& packet, Player* player) {
-	packet >> player->m_id;
-	packet >> player->m_actions;
-	packet >> player->m_actionsLeft;
-	sf::Vector2i pos;
-	packet >> pos.x << pos.y;
-	player->m_position.x = pos.x;
-	player->m_position.y = pos.y;
-	sf::Color color;
-	packet >> color.r >> color.g >> color.g >> color.a;
-	player->setColor(color);
-}
+sf::Packet& operator <<(sf::Packet& packet, const Move& move);
+sf::Packet& operator >>(sf::Packet& packet, Move& move);
+sf::Packet& operator <<(sf::Packet& packet, const Player* player);
+sf::Packet& operator >>(sf::Packet& packet, Player* player);
 
 #endif

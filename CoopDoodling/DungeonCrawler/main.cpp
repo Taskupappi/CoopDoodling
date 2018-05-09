@@ -1,11 +1,12 @@
 #include <SFML/Graphics.hpp>
 
+#include "Player.h"
+#include "zone.h"
 #include "scene.h"
 #include "network.h"
 #include <random>
 #include <iostream>
 #include <chrono>
-#include "Player.h"
 
 #define SCREEN_DIMENSION_X 800
 #define SCREEN_DIMENSION_Y 600
@@ -26,11 +27,7 @@ std::vector<Player*> players;
 std::vector<int> turnOrder;
 sf::Color randomPlayerColor();
 
-struct Move {
-	sf::Vector2i oldPosition;
-	sf::Vector2i newPosition;
-	int playerId;
-};
+
 std::vector<Move> activePlayerMoves;
 
 //random
@@ -85,7 +82,6 @@ int main(int argc, char* argv[])
 
 		//wait for the data required
 		sf::Packet packet;
-		network.socket().receive()
 	}
 	else if (connectionMode == "h") {
 		network.setHost(true);
@@ -356,9 +352,9 @@ sf::Color randomPlayerColor()
 void endTurn()
 {
 	activePlayer->endTurn();
-	for (int i = 0; i < players.size(); ++i) {
+	for (std::size_t i = 0; i < players.size(); ++i) {
 		if (players[i]->m_id == activePlayer->m_id
-			&& (i + 1) < players.size()) {
+			&& (i + static_cast<unsigned int>(1)) < players.size()) {
 			activePlayer = players[i + 1];			
 		}
 		else {
