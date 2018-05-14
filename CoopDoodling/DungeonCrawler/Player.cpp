@@ -31,3 +31,13 @@ sf::TcpSocket * Player::socket()
 {
 	return m_socket;
 }
+
+bool Player::activePlayer()
+{
+	return m_activePlayer;
+}
+
+void Player::setActivePlayer(bool isActive)
+{
+	m_activePlayer = isActive;
+}

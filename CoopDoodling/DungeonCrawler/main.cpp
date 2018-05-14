@@ -40,6 +40,8 @@ void sendTurn();
 
 int main(int argc, char* argv[])
 {
+	activePlayer = nullptr;
+
 	if (!font.loadFromFile(FONT_NAME)) {
 		std::cerr << "failed to load the required font: " << FONT_NAME << std::endl;
 		system("PAUSE");
@@ -82,6 +84,13 @@ int main(int argc, char* argv[])
 
 		//wait for the data required
 		sf::Packet packet;
+		std::size_t received;
+		bool allInitPacketsReceived = false;
+		if (network.socket().receive(packet) != sf::Socket::Status::Done) {
+			std::cerr << "error while trying to receive data from the host" << std::endl;
+			system("PAUSE");
+			exit(1);
+		}
 	}
 	else if (connectionMode == "h") {
 		network.setHost(true);
@@ -98,6 +107,7 @@ int main(int argc, char* argv[])
 		player->m_sprite.setOrigin((TILESIZE / 2.0f), (TILESIZE / 2.0f));
 		player->m_sprite.setPosition(sf::Vector2f(200, 200));
 		player->m_sprite.setScale(0.8f, 0.8f);
+		player->setActivePlayer(true);
 		players.push_back(player);
 		activePlayer = player;
 	}
@@ -355,9 +365,13 @@ void endTurn()
 	for (std::size_t i = 0; i < players.size(); ++i) {
 		if (players[i]->m_id == activePlayer->m_id
 			&& (i + static_cast<unsigned int>(1)) < players.size()) {
-			activePlayer = players[i + 1];			
+			activePlayer->setActivePlayer(false);
+			players[i + 1]->setActivePlayer(true);
+			activePlayer = players[i + 1];
 		}
 		else {
+			activePlayer->setActivePlayer(false);
+			players[0]->setActivePlayer(true);
 			activePlayer = players[0];
 		}
 	}

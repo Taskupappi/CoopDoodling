@@ -5,12 +5,19 @@
 #include <SFML\Network.hpp>
 
 #define PORT 3231
+#define NETWORK_BUFFER_SIZE 4096
+
 class Player;
 
 struct Move {
 	sf::Vector2i oldPosition;
 	sf::Vector2i newPosition;
 	int playerId;
+};
+
+enum class PacketType {
+	Player,
+	Move
 };
 
 class Network

@@ -24,9 +24,12 @@ public:
 	int m_actions;
 	Zone* m_zone;
 	sf::Vector2i m_position;
+	bool activePlayer();
+	void setActivePlayer(bool isActive);
 private:
 	sf::Color m_color;
 	sf::TcpSocket* m_socket;
+	bool m_activePlayer;
 };
 
 #endif
