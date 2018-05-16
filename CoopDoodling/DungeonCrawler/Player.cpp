@@ -32,7 +32,7 @@ sf::TcpSocket * Player::socket()
 	return m_socket;
 }
 
-bool Player::activePlayer()
+const bool Player::activePlayer()
 {
 	return m_activePlayer;
 }

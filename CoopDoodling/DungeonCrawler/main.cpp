@@ -82,15 +82,47 @@ int main(int argc, char* argv[])
 			connected = network.connect(address);
 		} while (!connected);
 
-		//wait for the data required
+		//wait for required data
+		std::cout << "Waiting for data from server" << std::endl;
 		sf::Packet packet;
 		std::size_t received;
 		bool allInitPacketsReceived = false;
-		if (network.socket().receive(packet) != sf::Socket::Status::Done) {
-			std::cerr << "error while trying to receive data from the host" << std::endl;
-			system("PAUSE");
-			exit(1);
+		while (!allInitPacketsReceived) {
+			if (network.socket().receive(packet) != sf::Socket::Status::Done) {
+				std::cerr << "error while trying to receive data from the host" << std::endl;
+				system("PAUSE");
+				exit(1);
+			}
+			Network::PacketType type;
+			packet >> type;
+			
+			switch (type) {
+			case Network::PacketType::Movement: {
+
+				break;
+			}
+			case Network::PacketType::Player: {
+				Player* remotePlayer = new Player(&zone);
+				packet >> remotePlayer;
+				players.push_back(remotePlayer);
+				break;
+			}
+			case Network::PacketType::InitDone: {
+				allInitPacketsReceived = true;
+				break;
+			}
+			}
+
 		}
+		for (Player* player : players) {
+			if (player->activePlayer()) {
+				activePlayer->setActivePlayer(false);
+				activePlayer = player;
+				player->setActivePlayer(true);
+				break;
+			}
+		}
+	
 	}
 	else if (connectionMode == "h") {
 		network.setHost(true);
@@ -249,7 +281,9 @@ int main(int argc, char* argv[])
 				players.push_back(player);
 
 				for (Player* player : players) {
-
+					sf::Packet playerPacket;
+					playerPacket << player;
+					network.socket().send(playerPacket);
 				}
 			}
 			else {

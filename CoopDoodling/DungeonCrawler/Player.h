@@ -24,7 +24,7 @@ public:
 	int m_actions;
 	Zone* m_zone;
 	sf::Vector2i m_position;
-	bool activePlayer();
+	const bool activePlayer();
 	void setActivePlayer(bool isActive);
 private:
 	sf::Color m_color;

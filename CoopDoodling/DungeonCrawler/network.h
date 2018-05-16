@@ -15,17 +15,23 @@ struct Move {
 	int playerId;
 };
 
-enum class PacketType {
-	Player,
-	Move
-};
-
 class Network
 {
 public:
+	/*
+	*Movement: packet holds a player/creature movement.
+	* might be changed to an action later.
+	*
+	*Player: packet holds a player object.
+	*
+	*InitDone: packet is empty. Simply lets the client know
+	*server has delivered all packages.
+	*
+	*/
 	enum class PacketType {
 		Movement,
-		ActivePlayer
+		Player,
+		InitDone,
 	};
 	Network();
 	~Network();
@@ -46,7 +52,9 @@ private:
 
 sf::Packet& operator <<(sf::Packet& packet, const Move& move);
 sf::Packet& operator >>(sf::Packet& packet, Move& move);
-sf::Packet& operator <<(sf::Packet& packet, const Player* player);
+sf::Packet& operator <<(sf::Packet& packet, Player* player);
 sf::Packet& operator >>(sf::Packet& packet, Player* player);
+sf::Packet& operator >>(sf::Packet& packet, Network::PacketType& type);
+sf::Packet& operator <<(sf::Packet& packet, const Network::PacketType& type);
 
 #endif

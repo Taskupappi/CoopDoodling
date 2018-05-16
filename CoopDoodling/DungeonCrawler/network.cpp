@@ -46,12 +46,13 @@ sf::Packet& operator >>(sf::Packet& packet, Move& move) {
 	return packet;
 }
 
-sf::Packet& operator <<(sf::Packet& packet, const Player* player) {
+sf::Packet& operator <<(sf::Packet& packet, Player* player) {
 	packet << player->m_id;
 	packet << player->m_actions;
 	packet << player->m_actionsLeft;
 	packet << player->m_position.x << player->m_position.y;
 	packet << player->color().r << player->color().g << player->color().b << player->color().a;
+	packet << player->activePlayer();
 	return packet;
 }
 
@@ -67,4 +68,15 @@ sf::Packet& operator >>(sf::Packet& packet, Player* player) {
 	packet >> color.r >> color.g >> color.g >> color.a;
 	player->setColor(color);
 	return packet;
+}
+
+sf::Packet & operator>>(sf::Packet & packet, Network::PacketType & type)
+{
+	packet >> type;
+	return packet;
+}
+
+sf::Packet & operator<<(sf::Packet & packet, const Network::PacketType & type)
+{
+	packet << type;
 }
